@@ -1,0 +1,22 @@
+node{
+    environment {
+        AWS_ACCOUNT_ID="0672-9157-0412"
+        AWS_DEFAULT_REGION="us-east-1"
+        IMAGE_REPO_NAME="sample"
+        IMAGE_TAG="latest"
+        REPOSITORY_URI = "067291570412.dkr.ecr.us-east-1.amazonaws.com/sample"
+    }
+    stage('logging into AWS ECR'){
+         sh "aws ecr get-login-password --region  us-east-1 | docker login --username AWS --password-stdin  067291570412.dkr.ecr.us-east-1.amazonaws.com"   
+    }
+    stage('git clone' ){
+        git branch: 'main', credentialsId: '6a771f54-4ab1-4f01-9387-2b989230aad4', url: 'https://github.com/D-dileep/dileep.git'
+    }
+    stage('Building image') {
+                sh 'docker image build -t sample .'
+    }
+    stage('Pushing to ECR') {
+                sh "docker tag sample:latest 067291570412.dkr.ecr.us-east-1.amazonaws.com/sample:latest"
+                sh "docker push 067291570412.dkr.ecr.us-east-1.amazonaws.com/sample:latest"
+    }
+}    
